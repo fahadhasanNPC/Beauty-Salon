@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Salon Timeslots - Beauty Salon{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/salon_services_slots.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="salon-timeslots">
+    <h1>{{ salon.name }} - Available Timeslots</h1>
+
+    <div class="timeslots-section">
+        <div class="timeslots-header">
+            <h2>Your Availability</h2>
+            <button class="primary-button" id="add-timeslot-button">Add New Timeslot</button>
+        </div>
+
+        <div class="add-timeslot-form" id="add-timeslot-form" style="display: none;">
+            <h3>Add New Availability</h3>
+            <form action="{{ url_for('salon_timeslots') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="form-group">
+                    <label for="date">Date</label>
+                    <input type="date" id="date" name="date" min="{{ now.date().strftime('%Y-%m-%d') }}"
+                        value="{{ now.date().strftime('%Y-%m-%d') }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="start_time">Start Time</label>
+                    <input type="time" id="start_time" name="start_time" min="09:00" max="20:00" step="900" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="end_time">End Time</label>
+                    <input type="time" id="end_time" name="end_time" min="09:00" max="20:00" step="900" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Add Slot</button>
+            </form>
+        </div>
+
+        <div class="timeslots-calendar">
+            <h3>Upcoming Available Timeslots</h3>
+            {% if timeslots %}
+            <div class="timeslots-by-date">
+                {% set current_date = '' %}
+                {% for slot in timeslots %}
+                {% if slot.date.strftime('%Y-%m-%d') != current_date %}
+                {% if current_date != '' %}
+            </div>
+            {% endif %}
+            {% set current_date = slot.date.strftime('%Y-%m-%d') %}
+            <div class="date-section">
+                <h4>{{ slot.date.strftime('%A, %B %d, %Y') }}</h4>
+                <div class="time-slots">
+                    {% endif %}
+
+                    <div class="time-slot {% if not slot.is_available %}booked{% endif %}"
+                        data-start="{{ slot.start_time.strftime('%H:%M') }}"
+                        data-end="{{ slot.end_time.strftime('%H:%M') }}" data-slot-id="{{ slot.id }}">
+                        <span class="time">
+                            {{ slot.start_time.strftime('%I:%M %p') }} - {{ slot.end_time.strftime('%I:%M %p') }}
+                        </span>
+                        <span class="status {% if slot.is_available %}available{% else %}booked{% endif %}">
+                            {% if slot.is_available %}Available{% else %}Booked{% endif %}
+                        </span>
+                        {% if slot.is_available %}
+                        <button class="delete-slot" data-slot-id="{{ slot.id }}">Delete</button>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="no-timeslots">
+                <p>You haven't added any available timeslots yet. Add timeslots to start receiving bookings!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Form toggle functionality
+        const addTimeslotButton = document.getElementById('add-timeslot-button');
+        const addTimeslotForm = document.getElementById('add-timeslot-form');
+        const cancelAddTimeslot = document.getElementById('cancel-add-timeslot');
+
+        // Time input validation
+        const startTimeInput = document.getElementById('start_time');
+        const endTimeInput = document.getElementById('end_time');
+
+        startTimeInput.addEventListener('change', function () {
+            endTimeInput.min = this.value;
+            if (endTimeInput.value && endTimeInput.value < this.value) {
+                endTimeInput.value = '';
+            }
+        });
+
+        addTimeslotButton.addEventListener('click', function () {
+            addTimeslotForm.style.display = 'block';
+            addTimeslotButton.style.display = 'none';
+        });
+
+        cancelAddTimeslot.addEventListener('click', function () {
+            addTimeslotForm.style.display = 'none';
+            addTimeslotButton.style.display = 'block';
+        });
+
+        // Debug: Log all time slot data
+        const timeSlots = document.querySelectorAll('.time-slot');
+        console.log('Total time slots found:', timeSlots.length);
+        timeSlots.forEach(slot => {
+            console.log('Slot:', {
+                start: slot.dataset.start,
+                end: slot.dataset.end,
+                available: !slot.classList.contains('booked')
+            });
+        });
+    });
+
+    // Handle delete slot functionality
+    document.querySelectorAll('.delete-slot').forEach(button => {
+        button.addEventListener('click', function () {
+            const slotId = this.dataset.slotId;
+            if (confirm('Are you sure you want to delete this timeslot?')) {
+                fetch(`/salon/timeslots/${slotId}/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token() }}'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            this.closest('.time-slot').remove();
+                            // If no more slots for this date, remove the date section
+                            const dateSection = this.closest('.date-section');
+                            if (dateSection.querySelectorAll('.time-slot').length === 0) {
+                                dateSection.remove();
+                            }
+                        } else {
+                            alert('Error deleting timeslot');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error deleting timeslot');
+                    });
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

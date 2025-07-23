@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+
+{% block title %}Beauty Salon - Salon Dashboard{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/salon_dashboard_profile.css') }}">
+{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h2>Welcome, {{ current_user.name }}</h2>
+        <div class="dashboard-actions">
+            <a href="{{ url_for('salon_profile') }}" class="btn btn-secondary">Edit Salon Profile</a>
+            <a href="{{ url_for('salon_services') }}" class="btn btn-secondary">Manage Services</a>
+            <a href="{{ url_for('salon_employees') }}" class="btn btn-secondary">Manage Employees</a>
+            <a href="{{ url_for('salon_timeslots') }}" class="btn btn-secondary">Manage Time Slots</a>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="dashboard-column">
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <h3>Salon Information</h3>
+                </div>
+                <div class="dashboard-card-body">
+                    <div class="salon-info">
+                        <h4>{{ salon.name }}</h4>
+                        <p><strong>Location:</strong> {{ salon.location }}</p>
+                        <p><strong>Phone:</strong> {{ salon.phone or 'Not set' }}</p>
+                        <p><strong>Opening Hours:</strong> {{ salon.opening_time or 'Not set' }} - {{ salon.closing_time
+                            or 'Not set' }}</p>
+                        <p><strong>Weekly Closing:</strong> {{ salon.weekly_closing or 'Not set' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <h3>Earnings</h3>
+                </div>
+                <div class="dashboard-card-body">
+                    <div class="earnings-info">
+                        <div class="earnings-current">
+                            <h4>Current Month</h4>
+                            <p class="earnings-amount">${{ current_month_earnings }}</p>
+                        </div>
+                        <div class="earnings-history">
+                            <h4>Earnings History</h4>
+                            {% if earnings_history %}
+                            <div class="history-items">
+                                {% for month, amount in earnings_history.items() %}
+                                <div class="history-item">
+                                    <span class="month">{{ month }}</span>
+                                    <span class="amount">${{ amount }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p>No earnings history available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <h3>Notifications</h3>
+                </div>
+                <div class="dashboard-card-body">
+                    <div class="dashboard-card-header">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h3>Notifications</h3>
+                            {% if notifications %}
+                            <button class="btn btn-sm btn-secondary" onclick="clearAllNotifications()">
+                                <i class="fas fa-trash-alt"></i> Clear All
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="notification-list">
+                        {% if notifications %}
+                        {% for notification in notifications %}
+                        <div class="notification-item" data-id="{{ notification.id }}">
+                            <div class="notification-content">
+                                {{ notification.content }}
+                            </div>
+                            <div class="notification-time">
+                                {{ notification.timestamp.strftime('%B %d, %Y at %H:%M') }}
+                            </div>
+                            <button class="btn-mark-read" onclick="markNotificationRead('{{ notification.id }}')">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="empty-state">
+                            <p>No new notifications</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-column">
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <h3>Pending Appointments</h3>
+                </div>
+                <div class="dashboard-card-body">
+                    <div class="appointment-list">
+                        {% if pending_appointments %}
+                        {% for appointment in pending_appointments %}
+                        <div class="appointment-item">
+                            <div class="appointment-info">
+                                <h4>{{ appointment.customer.name }}</h4>
+                                <p><strong>Service:</strong> {{ appointment.service.name }}</p>
+                                <p><strong>Date:</strong> {{ appointment.date.strftime('%B %d, %Y') }}</p>
+                                <p><strong>Time:</strong> {{ appointment.time.strftime('%H:%M') }}</p>
+                                <p><strong>Price:</strong> ${{ appointment.service.price }}</p>
+                            </div>
+                            {% if appointment.has_paid_deposit %}
+                            <div class="appointment-payment-info">
+                                <span class="payment-badge success">
+                                    <i class="fas fa-check-circle"></i> Deposit Received
+                                </span>
+                                <p class="discount-note">Customer paid deposit and gets 5% off</p>
+                                <p class="price-details">
+                                    <span class="original-price">৳{{ "%.2f"|format(appointment.service.price) }}</span>
+                                    <span class="discounted-price">৳{{ "%.2f"|format(appointment.discounted_price)
+                                        }}</span>
+                                </p>
+                                <p class="transaction-details">
+                                    <small>{{ appointment.payment_method }} | TrxID: {{ appointment.transaction_id
+                                        }}</small>
+                                </p>
+                            </div>
+                            {% elif appointment.deposit_amount > 0 %}
+                            <div class="appointment-payment-info">
+                                <span class="payment-badge pending">
+                                    <i class="fas fa-clock"></i> Deposit Payment Pending
+                                </span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="appointment-actions">
+                            <form action="{{ url_for('confirm_appointment', appointment_id=appointment.id) }}"
+                                method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" class="btn btn-primary">Confirm</button>
+                            </form>
+                            <form action="{{ url_for('cancel_appointment', appointment_id=appointment.id) }}"
+                                method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" class="btn btn-danger">Cancel</button>
+                            </form>
+                            <button class="btn btn-secondary"
+                                onclick="showMessageForm('{{ appointment.customer_id }}', '{{ appointment.id }}')">
+                                Message Customer
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <p>No pending appointments</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <h3>Confirmed Appointments</h3>
+            </div>
+            <div class="dashboard-card-body">
+                <div class="appointment-list">
+                    {% if confirmed_appointments %}
+                    {% for appointment in confirmed_appointments %}
+                    <div class="appointment-item">
+                        <div class="appointment-info">
+                            <h4>{{ appointment.customer.name }}</h4>
+                            <p><strong>Service:</strong> {{ appointment.service.name }}</p>
+                            <p><strong>Date:</strong> {{ appointment.date.strftime('%B %d, %Y') }}</p>
+                            <p><strong>Time:</strong> {{ appointment.time.strftime('%H:%M') }}</p>
+                            <p><strong>Price:</strong> ${{ appointment.service.price }}</p>
+                        </div>
+                        <div class="appointment-actions">
+                            <form action="{{ url_for('complete_appointment', appointment_id=appointment.id) }}"
+                                method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" class="btn btn-success">Mark as Completed</button>
+                            </form>
+                            <form action="{{ url_for('cancel_appointment', appointment_id=appointment.id) }}"
+                                method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" class="btn btn-danger">Cancel</button>
+                            </form>
+                            <button class="btn btn-secondary"
+                                onclick="showMessageForm('{{ appointment.customer_id }}', '{{ appointment.id }}')">
+                                Message Customer
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <p>No confirmed appointments</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Message Modal -->
+<div id="messageModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>Send Message</h3>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <input type="hidden" id="receiver_id" name="receiver_id">
+        <input type="hidden" id="appointment_id" name="appointment_id">
+        <div class="form-group">
+            <label for="content">Message</label>
+            <textarea id="content" name="content" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Message modal functionality
+    const modal = document.getElementById('messageModal');
+    const close = document.getElementsByClassName('close')[0];
+
+    function showMessageForm(receiverId, appointmentId) {
+        document.getElementById('receiver_id').value = receiverId;
+        document.getElementById('appointment_id').value = appointmentId;
+        modal.style.display = 'block';
+    }
+
+    close.onclick = function () {
+        modal.style.display = 'none';
+    }
+
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // Mark notification as read
+    function markNotificationRead(notificationId) {
+        fetch(`/mark-notification-read/${notificationId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const notification = document.querySelector(`.notification-item[data-id="${notificationId}"]`);
+                    notification.classList.add('read');
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 500);
+                }
+            });
+    }
+    function clearAllNotifications() {
+        fetch('/clear-all-notifications', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelector('.notification-list').innerHTML = `
+                <div class="empty-state">
+                    <p>No new notifications</p>
+                </div>
+            `;
+                }
+            });
+    }
+</script>
+{% endblock %}
+{% endblock %}

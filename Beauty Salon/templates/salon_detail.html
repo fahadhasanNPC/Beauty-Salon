@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}{{ salon.name }} - Beauty Salon{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/salon_detail.css') }}">
+{% endblock %}
+{% block content %}
+<div class="salon-detail">
+    <div class="salon-header">
+        <div class="salon-info">
+            <h1>{{ salon.name }}</h1>
+            <div class="salon-rating">
+                {% for i in range(5) %}
+                    {% if i < avg_rating|int %}
+                        <i class="fas fa-star"></i>
+                    {% elif i < avg_rating and i + 0.5 >= avg_rating %}
+                        <i class="fas fa-star-half-alt"></i>
+                    {% else %}
+                        <i class="far fa-star"></i>
+                    {% endif %}
+                {% endfor %}
+                <span class="rating-value">{{ avg_rating|round(1) }}</span>
+                <span class="reviews-count">({{ reviews|length }} reviews)</span>
+            </div>
+            <div class="salon-meta">
+                <p><i class="fas fa-map-marker-alt"></i> {{ salon.location }}</p>
+                {% if salon.phone %}
+                    <p><i class="fas fa-phone"></i> {{ salon.phone }}</p>
+                {% endif %}
+                {% if salon.opening_time and salon.closing_time %}
+                    <p><i class="fas fa-clock"></i> {{ salon.opening_time }} - {{ salon.closing_time }}</p>
+                {% endif %}
+                {% if salon.weekly_closing %}
+                    <p><i class="fas fa-door-closed"></i> Closed on {{ salon.weekly_closing }}</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="salon-actions">
+            {% if current_user.is_authenticated and current_user.role == 'customer' %}
+                <a href="{{ url_for('book_appointment', salon_id=salon.id) }}" class="primary-button book-now">Book Now</a>
+            {% elif not current_user.is_authenticated %}
+                <a href="{{ url_for('login') }}" class="primary-button">Login to Book</a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="salon-gallery">
+        {% if salon.images %}
+            <div class="gallery-container">
+                {% for image in salon.images %}
+                    <div class="gallery-item">
+                        <img src="{{ url_for('static', filename=image.image_path) }}" alt="{{ salon.name }}">
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="gallery-placeholder">
+                <img src="{{ url_for('static', filename='uploads/default_salon.jpg') }}" alt="{{ salon.name }}">
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="salon-description">
+        <h2>About {{ salon.name }}</h2>
+        <p>{{ salon.description }}</p>
+    </div>
+    
+    <div class="salon-services">
+        <h2>Our Services</h2>
+        {% if services %}
+            <div class="services-list">
+                {% for service in services %}
+                    <div class="service-item">
+                        <div class="service-info">
+                            <h3>{{ service.name }}</h3>
+                            <p class="service-description">{{ service.description }}</p>
+                            <div class="service-meta">
+                                <span class="service-duration"><i class="fas fa-clock"></i> {{ service.duration }} mins</span>
+                            </div>
+                        </div>
+                        <div class="service-price">
+                            <span>৳{{ service.price }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No services listed yet.</p>
+        {% endif %}
+    </div>
+    
+    <div class="salon-reviews">
+        <div class="reviews-header">
+            <h2>Customer Reviews</h2>
+            {% if current_user.is_authenticated and current_user.role == 'customer' %}
+                <button id="write-review-button" class="primary-button">Write a Review</button>
+            {% endif %}
+        </div>
+        
+        {% if current_user.is_authenticated and current_user.role == 'customer' %}
+            <div id="review-form" class="review-form" style="display: none;">
+                <h3>Your Review</h3>
+                <form action="{{ url_for('post_review', salon_id=salon.id) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="form-group rating-selector">
+                        <label>Your Rating</label>
+                        <div class="stars">
+                            <input type="radio" id="star5" name="rating" value="5" required>
+                            <label for="star5"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star4" name="rating" value="4" required>
+                            <label for="star4"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star3" name="rating" value="3" required>
+                            <label for="star3"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star2" name="rating" value="2" required>
+                            <label for="star2"><i class="fas fa-star"></i></label>
+                            <input type="radio" id="star1" name="rating" value="1" required>
+                            <label for="star1"><i class="fas fa-star"></i></label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="comment">Your Comment</label>
+                        <textarea id="comment" name="comment" rows="4" required></textarea>
+                    </div>
+                    
+                    <div class="form-buttons">
+                        <button type="submit" class="primary-button">Submit Review</button>
+                        <button type="button" id="cancel-review" class="secondary-button">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+        
+        <div class="reviews-list">
+            {% if reviews %}
+                {% for review in reviews %}
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <h4>{{ review.customer.name }}</h4>
+                                <span class="review-date">{{ review.date_posted.strftime('%B %d, %Y') }}</span>
+                            </div>
+                            <div class="review-rating">
+                                {% for i in range(5) %}
+                                    {% if i < review.rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="review-content">
+                            <p>{{ review.comment }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No reviews yet. Be the first to review this salon!</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const writeReviewButton = document.getElementById('write-review-button');
+        const reviewForm = document.getElementById('review-form');
+        const cancelReview = document.getElementById('cancel-review');
+        
+        if (writeReviewButton) {
+            writeReviewButton.addEventListener('click', function() {
+                reviewForm.style.display = 'block';
+                writeReviewButton.style.display = 'none';
+            });
+        }
+        
+        if (cancelReview) {
+            cancelReview.addEventListener('click', function() {
+                reviewForm.style.display = 'none';
+                writeReviewButton.style.display = 'block';
+            });
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

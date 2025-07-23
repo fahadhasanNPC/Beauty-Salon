@@ -1,0 +1,143 @@
+
+{% extends "base.html" %}
+
+{% block title %}Payment - {{ salon.name }}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/payment.css') }}">
+{% endblock %}
+{% block content %}
+<div class="payment-container">
+    <div class="payment-header">
+        <h1>Complete Your Payment</h1>
+        <p>Secure your appointment with a small deposit</p>
+    </div>
+
+    <div class="payment-details">
+        <div class="payment-summary">
+            <h2>Booking Summary</h2>
+            <div class="summary-item">
+                <span>Service:</span>
+                <span>{{ service.name }}</span>
+            </div>
+            <div class="summary-item">
+                <span>Salon:</span>
+                <span>{{ salon.name }}</span>
+            </div>
+            <div class="summary-item">
+                <span>Date:</span>
+                <span>{{ appointment.date.strftime('%A, %d %B %Y') }}</span>
+            </div>
+            <div class="summary-item">
+                <span>Time:</span>
+                <span>{{ appointment.time.strftime('%I:%M %p') }}</span>
+            </div>
+            <div class="summary-item highlight">
+                <span>Original Price:</span>
+                <span>৳{{ "%.2f"|format(service.price) }}</span>
+            </div>
+            <div class="summary-item highlight">
+                <span>Discounted Price:</span>
+                <span>৳{{ "%.2f"|format(discounted_price) }} (5% off)</span>
+            </div>
+            <div class="summary-item highlight">
+                <span>Deposit Amount (3%):</span>
+                <span>৳{{ "%.2f"|format(deposit_amount) }}</span>
+            </div>
+        </div>
+
+        <div class="payment-methods">
+            <h2>Choose Payment Method</h2>
+            <form action="{{ url_for('process_payment', appointment_id=appointment.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                
+                <div class="payment-options">
+                    <div class="payment-option">
+                        <input type="radio" id="bkash" name="payment_method" value="bkash" required>
+                        <label for="bkash">
+                            <img src="{{ url_for('static', filename='images/bkash.svg') }}" alt="bKash">
+                            <span>bKash</span>
+                        </label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" id="nagad" name="payment_method" value="nagad">
+                        <label for="nagad">
+                            <img src="{{ url_for('static', filename='images/nagad.svg') }}" alt="Nagad">
+                            <span>Nagad</span>
+                        </label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" id="rocket" name="payment_method" value="rocket">
+                        <label for="rocket">
+                            <img src="{{ url_for('static', filename='images/rocket.png') }}" alt="Rocket">
+                            <span>Rocket</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="payment-instructions">
+                    <div class="instruction-box bkash-instructions" style="display: none;">
+                        <h3>bKash Payment Instructions</h3>
+                        <ol>
+                            <li>Open your bKash app and select 'Send Money'</li>
+                            <li>Enter the merchant number: 01712345678</li>
+                            <li>Enter amount: ৳{{ "%.2f"|format(deposit_amount) }}</li>
+                            <li>Add reference: "AppointmentID-{{ appointment.id }}"</li>
+                            <li>Complete the payment and enter the Transaction ID below</li>
+                        </ol>
+                    </div>
+                    <div class="instruction-box nagad-instructions" style="display: none;">
+                        <h3>Nagad Payment Instructions</h3>
+                        <ol>
+                            <li>Open your Nagad app and select 'Send Money'</li>
+                            <li>Enter the merchant number: 01812345678</li>
+                            <li>Enter amount: ৳{{ "%.2f"|format(deposit_amount) }}</li>
+                            <li>Add reference: "AppointmentID-{{ appointment.id }}"</li>
+                            <li>Complete the payment and enter the Transaction ID below</li>
+                        </ol>
+                    </div>
+                    <div class="instruction-box rocket-instructions" style="display: none;">
+                        <h3>Rocket Payment Instructions</h3>
+                        <ol>
+                            <li>Open your Rocket app and select 'Send Money'</li>
+                            <li>Enter the merchant number: 01912345678</li>
+                            <li>Enter amount: ৳{{ "%.2f"|format(deposit_amount) }}</li>
+                            <li>Add reference: "AppointmentID-{{ appointment.id }}"</li>
+                            <li>Complete the payment and enter the Transaction ID below</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="transaction_id">Transaction ID</label>
+                    <input type="text" id="transaction_id" name="transaction_id" placeholder="Enter your transaction ID" required>
+                </div>
+
+                <div class="payment-buttons">
+                    <button type="submit" class="primary-button">Complete Payment</button>
+                    <a href="{{ url_for('customer_dashboard') }}" class="secondary-button">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const paymentOptions = document.querySelectorAll('input[name="payment_method"]');
+        const instructionBoxes = document.querySelectorAll('.instruction-box');
+        
+        paymentOptions.forEach(option => {
+            option.addEventListener('change', function() {
+                // Hide all instruction boxes
+                instructionBoxes.forEach(box => {
+                    box.style.display = 'none';
+                });
+                
+                // Show the selected payment method instructions
+                const selectedMethod = this.value;
+                document.querySelector(`.${selectedMethod}-instructions`).style.display = 'block';
+            });
+        });
+    });
+</script>
+{% endblock %}

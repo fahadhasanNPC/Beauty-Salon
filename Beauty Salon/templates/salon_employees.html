@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Beauty Salon - Manage Employees{% endblock %}
+<!-- {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/salon_employees.css') }}">
+{% endblock %} -->
+{% block content %}
+<div class="employees-container">
+    <div class="employees-header">
+        <h2>Manage Employees - {{ salon.name }}</h2>
+        <a href="{{ url_for('salon_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+
+    <div class="employees-content">
+        <div class="employees-form-card">
+            <h3>Add New Employee</h3>
+            <form action="{{ url_for('salon_employees') }}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="form-group">
+                    <label for="name">Employee Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="role">Role/Position</label>
+                    <input type="text" id="role" name="role" placeholder="e.g. Hair Stylist, Manicurist" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="image">Employee Photo</label>
+                    <input type="file" id="image" name="image" accept="image/*">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Add Employee</button>
+            </form>
+        </div>
+
+        <div class="employees-list-card">
+            <h3>Current Employees</h3>
+            {% if employees %}
+                <div class="employees-grid">
+                    {% for employee in employees %}
+                        <div class="employee-card">
+                            <div class="employee-image">
+                                {% if employee.image and employee.image != 'default_employee.jpg' %}
+                                    <img src="{{ url_for('static', filename=employee.image) }}" alt="{{ employee.name }}">
+                                {% else %}
+                                    <div class="employee-placeholder">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="employee-info">
+                                <h4>{{ employee.name }}</h4>
+                                <p class="employee-role">{{ employee.role }}</p>
+                            </div>
+                            <div class="employee-actions">
+                                <button class="btn btn-sm btn-secondary" onclick="toggleEditForm('{{ employee.id }}')">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <form action="{{ url_for('salon_employees') }}/{{ employee.id }}/delete" method="POST" 
+                                      onsubmit="return confirm('Are you sure you want to remove this employee?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i> Remove
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <!-- Hidden Edit Form -->
+                            <div id="edit-form-{{ employee.id }}" class="employee-edit-form" style="display: none;">
+                                <form action="{{ url_for('salon_employees') }}/{{ employee.id }}/update" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <div class="form-group">
+                                        <label for="edit-name-{{ employee.id }}">Employee Name</label>
+                                        <input type="text" id="edit-name-{{ employee.id }}" name="name" 
+                                               value="{{ employee.name }}" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="edit-role-{{ employee.id }}">Role/Position</label>
+                                        <input type="text" id="edit-role-{{ employee.id }}" name="role" 
+                                               value="{{ employee.role }}" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="edit-image-{{ employee.id }}">Update Photo</label>
+                                        <input type="file" id="edit-image-{{ employee.id }}" name="image" accept="image/*">
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="button" class="btn btn-secondary" 
+                                                onclick="toggleEditForm('{{ employee.id }}')">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <p>No employees added yet</p>
+                    <p>Add your first employee using the form on the left</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    function toggleEditForm(employeeId) {
+        const editForm = document.getElementById(`edit-form-${employeeId}`);
+        if (editForm.style.display === 'none') {
+            editForm.style.display = 'block';
+        } else {
+            editForm.style.display = 'none';
+        }
+    }
+    
+    // Preview uploaded image
+    document.getElementById('image').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewContainer = document.createElement('div');
+                previewContainer.classList.add('image-preview');
+                
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.alt = 'Employee image preview';
+                
+                previewContainer.appendChild(img);
+                
+                // Remove any existing preview
+                const existingPreview = document.querySelector('.employees-form-card .image-preview');
+                if (existingPreview) {
+                    existingPreview.remove();
+                }
+                
+                // Add before the submit button
+                const submitButton = document.querySelector('.employees-form-card button[type="submit"]');
+                submitButton.parentNode.insertBefore(previewContainer, submitButton);
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <!-- Background gradient representing a blurred vintage salon -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d6b994;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8c6e4e;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Filter for the blurred background effect -->
+    <filter id="blurFilter">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" />
+    </filter>
+    
+    <!-- Pattern for vintage salon elements -->
+    <pattern id="salonPattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+      <g filter="url(#blurFilter)">
+        <!-- Vintage salon chair silhouette -->
+        <path d="M20,80 C25,60 35,65 40,50 C45,35 35,20 50,20 C65,20 55,35 60,50 C65,65 75,60 80,80 L20,80" fill="#a58967" opacity="0.3" />
+        <!-- Vintage mirror silhouette -->
+        <rect x="65" y="10" width="20" height="35" rx="2" fill="#a58967" opacity="0.3" />
+        <!-- Scissors silhouette -->
+        <path d="M15,25 C12,22 10,15 15,12 C20,9 25,15 22,18 L30,25 L22,32 C25,35 20,41 15,38 C10,35 12,28 15,25" fill="#a58967" opacity="0.3" />
+      </g>
+    </pattern>
+  </defs>
+  
+  <!-- Main background -->
+  <rect width="100%" height="100%" fill="url(#bgGradient)" />
+  
+  <!-- Pattern overlay -->
+  <rect width="100%" height="100%" fill="url(#salonPattern)" opacity="0.7" />
+  
+  <!-- Decorative elements suggesting a vintage salon -->
+  <g opacity="0.4" filter="url(#blurFilter)">
+    <!-- Decorative frame corners -->
+    <path d="M50,50 L100,50 L100,100 L50,50" fill="#d6b994" />
+    <path d="M750,50 L700,50 L700,100 L750,50" fill="#d6b994" />
+    <path d="M50,450 L100,450 L100,400 L50,450" fill="#d6b994" />
+    <path d="M750,450 L700,450 L700,400 L750,450" fill="#d6b994" />
+    
+    <!-- Decorative swirls -->
+    <path d="M200,100 C250,80 300,120 350,100" stroke="#d6b994" stroke-width="3" fill="none" />
+    <path d="M450,100 C500,80 550,120 600,100" stroke="#d6b994" stroke-width="3" fill="none" />
+    <path d="M200,400 C250,420 300,380 350,400" stroke="#d6b994" stroke-width="3" fill="none" />
+    <path d="M450,400 C500,420 550,380 600,400" stroke="#d6b994" stroke-width="3" fill="none" />
+  </g>
+  
+  <!-- Main title text with shadow -->
+  <g>
+    <!-- Shadow -->
+    <text x="402" y="252" font-family="Palatino, serif" font-size="60" text-anchor="middle" fill="#5e4a32">Sanjana's Salon</text>
+    <!-- Main text -->
+    <text x="400" y="250" font-family="Palatino, serif" font-size="60" text-anchor="middle" fill="#d6b994">Sanjana's Salon</text>
+  </g>
+  
+  <!-- Decorative scissors icon -->
+  <g transform="translate(400, 300) scale(0.6)" opacity="0.6">
+    <path d="M-40,-20 C-50,-30 -55,-50 -40,-60 C-25,-70 -15,-45 -25,-35 L25,15 L-25,65 C-15,75 -25,100 -40,90 C-55,80 -50,60 -40,50 L10,0 L-40,-20" fill="none" stroke="#d6b994" stroke-width="5" />
+    <circle cx="-40" cy="-45" r="8" fill="none" stroke="#d6b994" stroke-width="3" />
+    <circle cx="-40" cy="75" r="8" fill="none" stroke="#d6b994" stroke-width="3" />
+  </g>
+  
+  <!-- Decorative elegant line under the text -->
+  <path d="M250,290 C350,310 450,310 550,290" fill="none" stroke="#d6b994" stroke-width="3" />
+</svg>

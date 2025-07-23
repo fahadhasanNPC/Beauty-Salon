@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Beauty Salon - Manage Services{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/salon_services_slots.css') }}">
+{% endblock %}
+{% block content %}
+<div class="services-container">
+    <div class="services-header">
+        <h2>Manage Services - {{ salon.name }}</h2>
+        <a href="{{ url_for('salon_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+
+    <div class="services-content">
+        <div class="services-form-card">
+            <h3>Add New Service</h3>
+            <form action="{{ url_for('salon_services') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group">
+                    <label for="name">Service Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="price">Price (৳)</label>
+                    <input type="number" id="price" name="price" min="0" step="0.01" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="duration">Duration (minutes)</label>
+                    <input type="number" id="duration" name="duration" min="5" step="5" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Add Service</button>
+            </form>
+        </div>
+
+        <div class="services-list-card">
+            <h3>Current Services</h3>
+            {% if services %}
+                <div class="services-list">
+                    {% for service in services %}
+                        <div class="service-item">
+                            <div class="service-info">
+                                <h4>{{ service.name }}</h4>
+                                <p class="service-description">{{ service.description }}</p>
+                                <div class="service-details">
+                                    <span class="service-price">৳{{ "%.2f"|format(service.price) }}</span>
+                                    <span class="service-duration">{{ service.duration }} minutes</span>
+                                </div>
+                            </div>
+                            <div class="service-actions">
+                                <button class="btn btn-sm btn-secondary" onclick="toggleEditForm('{{ service.id }}')">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <form action="{{ url_for('delete_service', service_id=service.id) }}" method="POST" 
+                                      onsubmit="return confirm('Are you sure you want to delete this service?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <!-- Hidden Edit Form -->
+                            <div id="edit-form-{{ service.id }}" class="service-edit-form" style="display: none;">
+                                <form action="{{ url_for('update_service', service_id=service.id) }}" method="POST">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <div class="form-group">
+                                        <label for="edit-name-{{ service.id }}">Service Name</label>
+                                        <input type="text" id="edit-name-{{ service.id }}" name="name" 
+                                               value="{{ service.name }}" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="edit-description-{{ service.id }}">Description</label>
+                                        <textarea id="edit-description-{{ service.id }}" name="description" 
+                                                  rows="3">{{ service.description }}</textarea>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="edit-price-{{ service.id }}">Price (৳)</label>
+                                        <input type="number" id="edit-price-{{ service.id }}" name="price" 
+                                               min="0" step="0.01" value="{{ "%.2f"|format(service.price) }}" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="edit-duration-{{ service.id }}">Duration (minutes)</label>
+                                        <input type="number" id="edit-duration-{{ service.id }}" name="duration" 
+                                               min="5" step="5" value="{{ service.duration }}" required>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="button" class="btn btn-secondary" 
+                                                onclick="toggleEditForm('{{ service.id }}')">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <p>No services added yet</p>
+                    <p>Add your first service using the form on the left</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    function toggleEditForm(serviceId) {
+        const editForm = document.getElementById(`edit-form-${serviceId}`);
+        editForm.style.display = editForm.style.display === 'none' ? 'block' : 'none';
+        
+        // Close all other edit forms
+        document.querySelectorAll('.service-edit-form').forEach(form => {
+            if (form.id !== `edit-form-${serviceId}`) {
+                form.style.display = 'none';
+            }
+        });
+    }
+</script>
+{% endblock %}
+{% endblock %}

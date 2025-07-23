@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Beauty Salon - Edit Salon Profile{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/salon_dashboard_profile.css') }}">
+{% endblock %}
+{% block content %}
+<div class="profile-container">
+    <div class="profile-card">
+        <h2>Edit Salon Profile</h2>
+        <form action="{{ url_for('salon_profile') }}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="form-group">
+                <label for="salon_name">Salon Name</label>
+                <input type="text" id="salon_name" name="salon_name" value="{{ salon.name }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="4">{{ salon.description }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" value="{{ salon.location }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" name="phone" value="{{ salon.phone }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="opening_time">Opening Time</label>
+                <input type="time" id="opening_time" name="opening_time" value="{{ salon.opening_time }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="closing_time">Closing Time</label>
+                <input type="time" id="closing_time" name="closing_time" value="{{ salon.closing_time }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="weekly_closing">Weekly Closing Day</label>
+                <select id="weekly_closing" name="weekly_closing">
+                    <option value="" {% if not salon.weekly_closing %}selected{% endif %}>None</option>
+                    <option value="Monday" {% if salon.weekly_closing == 'Monday' %}selected{% endif %}>Monday</option>
+                    <option value="Tuesday" {% if salon.weekly_closing == 'Tuesday' %}selected{% endif %}>Tuesday</option>
+                    <option value="Wednesday" {% if salon.weekly_closing == 'Wednesday' %}selected{% endif %}>Wednesday</option>
+                    <option value="Thursday" {% if salon.weekly_closing == 'Thursday' %}selected{% endif %}>Thursday</option>
+                    <option value="Friday" {% if salon.weekly_closing == 'Friday' %}selected{% endif %}>Friday</option>
+                    <option value="Saturday" {% if salon.weekly_closing == 'Saturday' %}selected{% endif %}>Saturday</option>
+                    <option value="Sunday" {% if salon.weekly_closing == 'Sunday' %}selected{% endif %}>Sunday</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="salon_images">Salon Images</label>
+                <input type="file" id="salon_images" name="salon_images" multiple accept="image/*">
+                <p class="input-hint">You can select multiple images to upload</p>
+            </div>
+            
+            {% if salon.images %}
+                <div class="salon-images-preview">
+                    <h4>Current Images</h4>
+                    <div class="image-grid">
+                        {% for image in salon.images %}
+                            <div class="image-item">
+                                <img src="{{ url_for('static', filename=image.image_path) }}" alt="Salon image">
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="form-actions">
+                <a href="{{ url_for('salon_dashboard') }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Preview uploaded images
+    document.getElementById('salon_images').addEventListener('change', function(event) {
+        const files = event.target.files;
+        if (files.length > 0) {
+            const previewContainer = document.createElement('div');
+            previewContainer.classList.add('salon-images-preview');
+            
+            const heading = document.createElement('h4');
+            heading.textContent = 'New Images Preview';
+            previewContainer.appendChild(heading);
+            
+            const imageGrid = document.createElement('div');
+            imageGrid.classList.add('image-grid');
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const imgContainer = document.createElement('div');
+                        imgContainer.classList.add('image-item');
+                        
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.alt = 'Image preview';
+                        
+                        imgContainer.appendChild(img);
+                        imageGrid.appendChild(imgContainer);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            }
+            
+            previewContainer.appendChild(imageGrid);
+            
+            // Remove any existing preview
+            const existingPreview = document.querySelector('.salon-images-preview + .salon-images-preview');
+            if (existingPreview) {
+                existingPreview.remove();
+            }
+            
+            // Insert after the existing images or before form actions
+            const existingImages = document.querySelector('.salon-images-preview');
+            if (existingImages) {
+                existingImages.parentNode.insertBefore(previewContainer, existingImages.nextSibling);
+            } else {
+                const formActions = document.querySelector('.form-actions');
+                formActions.parentNode.insertBefore(previewContainer, formActions);
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

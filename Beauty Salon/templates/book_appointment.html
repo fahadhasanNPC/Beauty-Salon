@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block title %}Book Appointment - {{ salon.name }}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/book_appointment.css') }}">
+{% endblock %}
+{% block content %}
+<div class="book-appointment">
+    <h1>Book an Appointment</h1>
+    <div class="salon-brief">
+        <h2>{{ salon.name }}</h2>
+        <p><i class="fas fa-map-marker-alt"></i> {{ salon.location }}</p>
+    </div>
+
+    <div class="booking-form">
+        <form action="{{ url_for('book_appointment', salon_id=salon.id) }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+            <div class="form-section">
+                <h3>1. Select a Service</h3>
+                <div class="service-selection">
+                    {% for service in services %}
+                    <div class="service-option">
+                        <input type="radio" id="service-{{ service.id }}" name="service_id" value="{{ service.id }}"
+                            required {% if request.args.get('service_id')|int==service.id %}checked{% endif %}>
+                        <label for="service-{{ service.id }}">
+                            <div class="service-details">
+                                <span class="service-name">{{ service.name }}</span>
+                                <span class="service-duration"><i class="fas fa-clock"></i> {{ service.duration }}
+                                    mins</span>
+                                <span class="service-price">৳{{ "%.2f"|format(service.price) }}</span>
+                            </div>
+                            {% if service.description %}
+                            <div class="service-description">
+                                <p>{{ service.description }}</p>
+                            </div>
+                            {% endif %}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>2. Select a Date</h3>
+                <div class="date-selection">
+                    <div class="form-group">
+                        <select id="appointment-date" name="date" required>
+                            <option value="">Select a date</option>
+                            {% for slot in date_slots if date_slots is not none %}
+                            <option value="{{ slot.date_str }}">
+                                {{ slot.day_name }}, {{ slot.date_str }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>3. Select a Time</h3>
+                <div class="time-selection">
+                    <div class="form-group">
+                        <select id="appointment-time" name="time" required disabled>
+                            <option value="">Select a date first</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="time-slots-container" class="time-slots-display" style="display: none;">
+                    <!-- Time slots will be populated here via JavaScript -->
+                </div>
+            </div>
+
+            <div class="booking-summary">
+                <h3>Booking Summary</h3>
+                <div class="summary-details">
+                    <div class="summary-item">
+                        <span class="summary-label">Service:</span>
+                        <span class="summary-value" id="summary-service">Not selected</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Date:</span>
+                        <span class="summary-value" id="summary-date">Not selected</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Time:</span>
+                        <span class="summary-value" id="summary-time">Not selected</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Price:</span>
+                        <span class="summary-value" id="summary-price">৳0.00</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-section payment-option">
+                <h3>4. Pre-payment Option</h3>
+                <div class="payment-selection">
+                    <div class="payment-info">
+                        <p>Pay a small deposit now (3% of service fee) and get 5% discount on your service!</p>
+                    </div>
+                    <div class="payment-toggle">
+                        <input type="checkbox" id="pay-deposit" name="pay_deposit" value="1">
+                        <label for="pay-deposit">Yes, I want to pay deposit and get a discount</label>
+                    </div>
+                    <div class="payment-note">
+                        <p><i class="fas fa-info-circle"></i> You'll be redirected to payment options after booking.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="form-buttons">
+                <button type="submit" class="primary-button">Book Appointment</button>
+                <a href="{{ url_for('salon_detail', salon_id=salon.id) }}" class="secondary-button">Cancel</a>
+            </div>
+            
+        </form>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Debug logs for initial data verification
+        console.log('Raw date_slots from server:', {{ date_slots| tojson | safe }});
+    console.log('Raw services from server:', {{ services| tojson | safe }});
+
+    // Process data with safety checks
+    const dateSlotsData = {};
+    {% for slot in date_slots %}
+    dateSlotsData["{{ slot.date_str }}"] = {
+        date_str: "{{ slot.date_str }}",
+        day_name: "{{ slot.day_name }}",
+        times: [
+            {% for time in slot.times %}
+    {
+        start: "{{ time.time }}",
+            end: "{{ time.end_time }}"
+    } {% if not loop.last %}, {% endif %}
+    {% endfor %}
+                ]
+            };
+    {% endfor %}
+
+    const services = {{ services| tojson | safe }};
+
+    // Get DOM elements with null checks
+    const dateSelect = document.getElementById('appointment-date');
+    const timeSelect = document.getElementById('appointment-time');
+    const timeSlotsContainer = document.getElementById('time-slots-container');
+
+    if (!dateSelect || !timeSelect) {
+        console.error('Required form elements missing!');
+        return;
+    }
+
+    // Initialize form state
+    timeSelect.disabled = true;
+    timeSelect.innerHTML = '<option value="">Select a date first</option>';
+    if (timeSlotsContainer) {
+        timeSlotsContainer.style.display = 'none';
+    }
+
+    // Service selection handler
+    const serviceRadios = document.querySelectorAll('input[name="service_id"]');
+    const summaryService = document.getElementById('summary-service');
+    const summaryPrice = document.getElementById('summary-price');
+    const depositCheckbox = document.getElementById('pay-deposit');
+    let originalPrice = 0;
+    let discountedPrice = 0;
+
+    serviceRadios.forEach(radio => {
+        radio.addEventListener('change', function () {
+            const serviceId = parseInt(this.value);
+            const selectedService = services.find(s => s.id === serviceId);
+
+            if (selectedService && summaryService && summaryPrice) {
+                originalPrice = selectedService.price;
+                summaryService.textContent = selectedService.name;
+                
+                // Apply discount if checkbox is checked
+                if (depositCheckbox && depositCheckbox.checked) {
+                    discountedPrice = (originalPrice * 0.95).toFixed(2);
+                    summaryPrice.textContent = `৳${discountedPrice} (5% off)`;
+                } else {
+                    summaryPrice.textContent = `৳${originalPrice.toFixed(2)}`;
+                }
+            }
+        });
+    });
+    if (depositCheckbox && summaryPrice) {
+        depositCheckbox.addEventListener('change', function() {
+            if (!originalPrice) {
+                const preselectedService = document.querySelector('input[name="service_id"]:checked');
+                if (preselectedService) {
+                    const serviceId = parseInt(preselectedService.value);
+                    const selectedService = services.find(s => s.id === serviceId);
+                    if (selectedService) {
+                        originalPrice = selectedService.price;
+                    }
+                }
+            }
+            
+            if (originalPrice > 0) {
+                if (this.checked) {
+                    discountedPrice = (originalPrice * 0.95).toFixed(2);
+                    summaryPrice.textContent = `৳${discountedPrice} (5% off)`;
+                } else {
+                    summaryPrice.textContent = `৳${originalPrice.toFixed(2)}`;
+                }
+            }
+        });
+    }
+
+    // Initialize preselected service if exists
+    const preselectedService = document.querySelector('input[name="service_id"]:checked');
+    if (preselectedService && summaryService && summaryPrice) {
+        const serviceId = parseInt(preselectedService.value);
+        const selectedService = services.find(s => s.id === serviceId);
+        if (selectedService) {
+            summaryService.textContent = selectedService.name;
+            summaryPrice.textContent = `$${selectedService.price.toFixed(2)}`;
+        }
+    }
+
+    // Date selection handler - completely rewritten
+    dateSelect.addEventListener('change', function () {
+        const selectedDate = this.value;
+        const summaryDate = document.getElementById('summary-date');
+        const summaryTime = document.getElementById('summary-time');
+
+        if (!selectedDate) {
+            timeSelect.disabled = true;
+            timeSelect.innerHTML = '<option value="">Select a date first</option>';
+            if (timeSlotsContainer) timeSlotsContainer.style.display = 'none';
+            if (summaryDate) summaryDate.textContent = 'Not selected';
+            if (summaryTime) summaryTime.textContent = 'Not selected';
+            return;
+        }
+
+        // Update date summary
+        if (summaryDate) {
+            try {
+                const dateObj = new Date(selectedDate + 'T00:00'); // Ensure correct parsing
+                summaryDate.textContent = dateObj.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            } catch (e) {
+                console.error('Date formatting error:', e);
+                summaryDate.textContent = selectedDate;
+            }
+        }
+
+        // Process time slots
+        timeSelect.disabled = false;
+        timeSelect.innerHTML = '<option value="">Loading times...</option>';
+
+        const slotsForDate = Object.values(dateSlotsData).find(
+            slot => slot.date_str === selectedDate
+        );
+
+        console.log('Slots for selected date:', slotsForDate);
+
+        if (slotsForDate && slotsForDate.times && slotsForDate.times.length > 0) {
+            timeSelect.innerHTML = '<option value="">Select a time</option>';
+
+            slotsForDate.times.forEach(slot => {
+                const option = new Option(
+                    `${slot.start} - ${slot.end}`,
+                    slot.start
+                );
+                timeSelect.add(option);
+            });
+
+            // Update visual time slots if container exists
+            if (timeSlotsContainer) {
+                timeSlotsContainer.style.display = 'block';
+                timeSlotsContainer.innerHTML = '';
+
+                slotsForDate.times.forEach(slot => {
+                    const timeSlot = document.createElement('div');
+                    timeSlot.className = 'time-slot-option';
+                    timeSlot.dataset.time = slot.start;
+                    timeSlot.innerHTML = `
+                            <span class="time-range">${slot.start} - ${slot.end}</span>
+                        `;
+
+                    timeSlot.addEventListener('click', function () {
+                        document.querySelectorAll('.time-slot-option').forEach(ts => {
+                            ts.classList.remove('selected');
+                        });
+                        this.classList.add('selected');
+                        timeSelect.value = this.dataset.time;
+                        if (summaryTime) {
+                            summaryTime.textContent = `${this.dataset.time} - ${slot.end}`;
+                        }
+                    });
+
+                    timeSlotsContainer.appendChild(timeSlot);
+                });
+            }
+        } else {
+            timeSelect.innerHTML = '<option value="">No available slots</option>';
+            if (timeSlotsContainer) timeSlotsContainer.style.display = 'none';
+            console.warn('No slots available for date:', selectedDate);
+        }
+    });
+
+    // Time selection handler
+    timeSelect.addEventListener('change', function () {
+        const selectedTime = this.value;
+        const summaryTime = document.getElementById('summary-time');
+
+        if (!summaryTime) return;
+
+        if (selectedTime) {
+            const selectedDate = dateSelect.value;
+            const slotsForDate = dateSlotsData[selectedDate];
+
+            if (slotsForDate) {
+                const slot = slotsForDate.times.find(s => s.start === selectedTime);
+                if (slot) {
+                    summaryTime.textContent = `${slot.start} - ${slot.end}`;
+
+                    // Update visual selection if container exists
+                    if (timeSlotsContainer) {
+                        document.querySelectorAll('.time-slot-option').forEach(ts => {
+                            ts.classList.remove('selected');
+                            if (ts.dataset.time === selectedTime) {
+                                ts.classList.add('selected');
+                            }
+                        });
+                    }
+                }
+            }
+        } else {
+            summaryTime.textContent = 'Not selected';
+        }
+    });
+
+    console.log('Booking system initialized successfully');
+    });
+
+    
+</script>
+{% endblock %}
+{% endblock %}

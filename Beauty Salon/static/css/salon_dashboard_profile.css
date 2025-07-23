@@ -1,0 +1,750 @@
+
+/* Beauty Salon - Custom CSS Stylesheet
+ * Colors:
+ * - Deep Blue: #0118D8
+ * - Bright Blue: #1B56FD
+ * - Cream: #E9DFC3
+ * - Off-White: #FFF8F8
+ */
+
+/* ===== Base Styles ===== */
+:root {
+  --deep-pink: #D50B8B;
+  --greenish: #51b795;
+  --cream: #E9DFC3;
+  --off-white: #FFF8F8;
+  --light-shadow: rgba(27, 86, 253, 0.1);
+  --medium-shadow: rgba(1, 24, 216, 0.15);
+  --text-primary: #333;
+  --text-secondary: #666;
+  --danger: #e74c3c;
+  --success: #2ecc71;
+  --secondary: #95a5a6;
+  --border-radius-sm: 6px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 18px;
+  --transition-speed: 0.3s;
+}
+
+body {
+  font-family: 'Roboto', 'Segoe UI', sans-serif;
+  background-color: var(--off-white);
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== Typography ===== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', 'Segoe UI', sans-serif;
+  font-weight: 600;
+  margin-top: 0;
+  color: var(--deep-pink);
+}
+
+h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+h2::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(to right, var(--deep-pink), var(--greenish));
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  border-radius: 3px;
+}
+
+h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+h4 {
+  font-size: 1.2rem;
+  margin-bottom: 0.8rem;
+}
+
+/* ===== Layout Components ===== */
+
+/* Container */
+.profile-container, .dashboard {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+/* Profile Card */
+.profile-card {
+  background-color: #fff;
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 10px 30px var(--light-shadow);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  transition: all var(--transition-speed) ease;
+}
+
+.profile-card:hover {
+  box-shadow: 0 15px 40px var(--medium-shadow);
+  transform: translateY(-5px);
+}
+
+/* Dashboard Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.dashboard-actions {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.dashboard-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+  background-color: #fff;
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 8px 25px var(--light-shadow);
+  overflow: hidden;
+  transition: all var(--transition-speed) ease;
+}
+
+.dashboard-card:hover {
+  box-shadow: 0 12px 30px var(--medium-shadow);
+  transform: translateY(-3px);
+}
+
+.dashboard-card-header {
+  background-color: var(--cream);
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.dashboard-card-header h3 {
+  margin: 0;
+  color: var(--deep-pink);
+}
+
+.dashboard-card-body {
+  padding: 1.5rem;
+}
+
+/* ===== Form Elements ===== */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+input[type="text"],
+input[type="time"],
+input[type="file"],
+textarea,
+select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--off-white);
+  font-size: 1rem;
+  transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+input[type="text"]:focus,
+input[type="time"]:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--greenish);
+  box-shadow: 0 0 0 3px rgba(27, 86, 253, 0.15);
+  outline: none;
+}
+
+.input-hint {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.3rem;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* ===== Buttons ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1.4rem;
+  border-radius: 50px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+  border: none;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(255,255,255,0.2);
+  border-radius: 50px;
+  transform: scale(0);
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.btn:hover::after {
+  transform: scale(1.5);
+  opacity: 0;
+}
+
+.btn:active {
+  transform: translateY(2px);
+}
+
+.btn-primary {
+  background: var(--deep-pink);
+  color: white;
+  box-shadow: 0 4px 15px rgba(1, 24, 216, 0.3);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 7px 20px rgba(1, 24, 216, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background-color: #fff;
+  color: var(--greenish);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(27, 86, 253, 0.3);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(27, 86, 253, 0.05);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+.btn-danger:hover {
+  box-shadow: 0 7px 20px rgba(231, 76, 60, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  color: white;
+  box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+}
+
+.btn-success:hover {
+  box-shadow: 0 7px 20px rgba(46, 204, 113, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-mark-read {
+  background: none;
+  border: none;
+  color: var(--greenish);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all var(--transition-speed) ease;
+}
+
+.btn-mark-read:hover {
+  color: var(--deep-pink);
+  transform: scale(1.1);
+}
+
+/* ===== Salon Information ===== */
+.salon-info p {
+  margin: 0.5rem 0;
+}
+
+/* ===== Earnings ===== */
+.earnings-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.earnings-current {
+  text-align: center;
+  background-color: var(--cream);
+  padding: 1.5rem;
+  border-radius: var(--border-radius-md);
+}
+
+.earnings-amount {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--deep-pink);
+  margin: 0.5rem 0;
+}
+
+.history-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.7rem;
+  background-color: var(--off-white);
+  border-radius: var(--border-radius-sm);
+  transition: transform var(--transition-speed) ease;
+}
+
+.history-item:hover {
+  transform: translateX(5px);
+}
+
+/* ===== Notification List ===== */
+/* Replace the existing .notification-list styles with these */
+.notification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 400px; /* Set a fixed max height */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding-right: 8px; /* Space for scrollbar */
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: var(--greenish) var(--off-white); /* For Firefox */
+}
+
+/* Custom scrollbar for Webkit browsers */
+.notification-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notification-list::-webkit-scrollbar-track {
+  background: var(--off-white);
+  border-radius: 3px;
+}
+
+.notification-list::-webkit-scrollbar-thumb {
+  background-color: var(--greenish);
+  border-radius: 3px;
+}
+
+.notification-list::-webkit-scrollbar-thumb:hover {
+  background-color: var(--deep-pink);
+}
+
+/* Make notification items slightly more compact */
+.notification-item {
+  padding: 0.8rem;
+  margin-right: 4px; /* Prevent content from being hidden behind scrollbar */
+}
+
+.notification-content {
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.notification-time {
+  font-size: 0.75rem;
+}
+
+/* ===== Appointment List ===== */
+.appointment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.appointment-item {
+  background-color: var(--off-white);
+  border-radius: var(--border-radius-md);
+  padding: 1.2rem;
+  box-shadow: 0 4px 10px var(--light-shadow);
+  transition: all var(--transition-speed) ease;
+}
+
+.appointment-item:hover {
+  box-shadow: 0 8px 20px var(--medium-shadow);
+  transform: translateY(-3px);
+}
+
+.appointment-info {
+  margin-bottom: 1.2rem;
+}
+
+.appointment-info h4 {
+  margin-top: 0;
+  color: var(--deep-pink);
+}
+
+.appointment-info p {
+  margin: 0.4rem 0;
+}
+
+.appointment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.appointment-actions .btn {
+  flex: 1;
+  min-width: fit-content;
+}
+
+/* ===== Empty State ===== */
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+  background-color: var(--off-white);
+  border-radius: var(--border-radius-md);
+}
+
+/* ===== Modal ===== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  overflow: auto;
+  transition: all var(--transition-speed) ease;
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 15px 40px var(--medium-shadow);
+  transform: translateY(20px);
+  animation: modal-appear 0.3s forwards;
+}
+
+@keyframes modal-appear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.close {
+  float: right;
+  font-size: 1.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all var(--transition-speed) ease;
+}
+
+.close:hover {
+  color: var(--greenish);
+  transform: rotate(90deg);
+}
+
+/* ===== Image Grid ===== */
+.salon-images-preview {
+  margin: 1.5rem 0;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.image-item {
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  box-shadow: 0 4px 10px var(--light-shadow);
+  transition: all var(--transition-speed) ease;
+}
+
+.image-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px var(--medium-shadow);
+}
+
+.image-item img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  display: block;
+}
+
+/* ===== Animations ===== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.dashboard-card {
+  animation: slideInUp 0.5s ease forwards;
+}
+
+.notification-item, .appointment-item {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* ===== Responsive Design ===== */
+@media screen and (max-width: 992px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .dashboard-actions {
+    width: 100%;
+  }
+  
+  .modal-content {
+    margin: 15% auto;
+    width: 95%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  h2 {
+    font-size: 1.8rem;
+  }
+  
+  .dashboard-card-header, .dashboard-card-body {
+    padding: 1rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  
+  .form-actions .btn {
+    width: 100%;
+  }
+  
+  .appointment-actions {
+    flex-direction: column;
+  }
+  
+  .btn {
+    padding: 0.6rem 1.2rem;
+  }
+  
+  .image-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .profile-container, .dashboard {
+    padding: 0 1rem;
+    margin: 1rem auto;
+  }
+  
+  .profile-card, .dashboard-card {
+    padding: 1.5rem 1rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  h3 {
+    font-size: 1.3rem;
+  }
+  
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .image-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+  
+  .image-item img {
+    height: 80px;
+  }
+}
+
+/* ===== Additional Styles for Special Elements ===== */
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--off-white);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--greenish);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--deep-pink);
+}
+
+/* Focus styles for accessibility */
+:focus {
+  outline: 3px solid rgba(27, 86, 253, 0.3);
+  outline-offset: 2px;
+}
+
+/* Styles for forms with validation */
+input:invalid, textarea:invalid, select:invalid {
+  border-color: var(--danger);
+}
+
+/* Loading animations */
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(27, 86, 253, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--greenish);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.appointment-payment-info {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #eee;
+}
+
+.payment-badge {
+  display: inline-block;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.payment-badge.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.payment-badge.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.discount-note {
+  font-size: 0.9rem;
+  color: #28a745;
+  margin-bottom: 5px;
+}
+
+.price-details {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: #6c757d;
+  margin-right: 8px;
+}
+
+.discounted-price {
+  font-weight: bold;
+  color: #e44d26;
+}
+
+.payment-method, .transaction-details {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.btn-complete-payment {
+  display: inline-block;
+  padding: 5px 10px;
+  background-color: #e44d26;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 0.8rem;
+  margin-top: 5px;
+}
+
+.btn-complete-payment:hover {
+  background-color: #d03d1b;
+}

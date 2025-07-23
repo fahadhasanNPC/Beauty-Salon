@@ -1,0 +1,70 @@
+.featured-salons {
+    padding: 2rem 0;
+    text-align: center;
+    background-color: #f9f9f9;
+}
+
+.featured-salons h2 {
+    margin-bottom: 1.5rem;
+}
+
+.salon-grid {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.salon-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    transition: transform 0.3s ease;
+}
+
+.salon-card:hover {
+    transform: translateY(-5px);
+}
+
+.salon-image {
+    height: 200px;
+    overflow: hidden;
+}
+
+.salon-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.salon-info {
+    padding: 1rem;
+}
+
+.salon-info h3 {
+    margin: 0 0 0.5rem 0;
+}
+
+.salon-info .location {
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.no-salons {
+    padding: 1rem;
+    color: #666;
+}
+
+h2 {
+    color: #D50B8B;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+
+  

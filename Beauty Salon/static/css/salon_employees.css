@@ -1,0 +1,431 @@
+
+/* === Employees Management Page Styles === */
+
+/* Employee Container Layout */
+.employees-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.employees-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.employees-header h2 {
+  margin: 0;
+  padding-bottom: 0.5rem;
+  position: relative;
+}
+
+.employees-header h2::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(to right, #D50B8B, #DC8BE0);
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  border-radius: 3px;
+}
+
+.employees-content {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+}
+
+/* Employee Form Card */
+.employees-form-card {
+  background-color: #fff;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(27, 86, 253, 0.1);
+  padding: 2rem;
+  height: fit-content;
+  transition: all 0.3s ease;
+}
+
+.employees-form-card:hover {
+  box-shadow: 0 15px 40px rgba(1, 24, 216, 0.15);
+  transform: translateY(-5px);
+}
+
+.employees-form-card h3 {
+  color: #D50B8B;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+/* Employee List Card */
+.employees-list-card {
+  background-color: #fff;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(27, 86, 253, 0.1);
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.employees-list-card:hover {
+  box-shadow: 0 15px 40px rgba(1, 24, 216, 0.15);
+  transform: translateY(-5px);
+}
+
+.employees-list-card h3 {
+  color: #D50B8B;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+/* Employee Grid */
+.employees-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Employee Card */
+.employee-card {
+  background-color: #FFF8F8;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 15px rgba(27, 86, 253, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+  padding: 1.5rem;
+}
+
+.employee-card:hover {
+  box-shadow: 0 12px 25px rgba(1, 24, 216, 0.15);
+  transform: translateY(-5px);
+}
+
+.employee-image {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  overflow: hidden;
+  border: 3px solid #E9DFC3;
+  box-shadow: 0 5px 15px rgba(1, 24, 216, 0.1);
+  transition: all 0.3s ease;
+}
+
+.employee-card:hover .employee-image {
+  border-color: #D50B8B;
+  transform: scale(1.05);
+}
+
+.employee-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.employee-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #E9DFC3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: #D50B8B;
+}
+
+.employee-info {
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+
+.employee-info h4 {
+  margin: 0 0 0.5rem;
+  color: #D50B8B;
+  font-size: 1.2rem;
+}
+
+.employee-role {
+  color: #666;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.employee-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+/* Small Buttons */
+.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+/* Edit Form */
+.employee-edit-form {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  animation: slideDown 0.3s ease forwards;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Image Preview */
+.image-preview {
+  margin: 1rem 0;
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+}
+
+.image-preview img {
+  max-width: 150px;
+  max-height: 150px;
+  border-radius: 50%;
+  border: 3px solid #E9DFC3;
+  box-shadow: 0 5px 15px rgba(1, 24, 216, 0.1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: #666;
+}
+
+.empty-state p:first-child {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #D50B8B;
+}
+
+/* Enhanced Form Styles */
+.employees-form-card .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.employees-form-card label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.employees-form-card input[type="text"],
+.employees-form-card input[type="file"] {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #FFF8F8;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.employees-form-card input[type="text"]:focus {
+  border-color: #1B56FD;
+  box-shadow: 0 0 0 3px rgba(27, 86, 253, 0.15);
+  outline: none;
+}
+
+.employees-form-card input[type="file"] {
+  padding: 0.6rem;
+  background-color: #FFF8F8;
+  cursor: pointer;
+}
+
+.employees-form-card button[type="submit"] {
+  width: 100%;
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+}
+
+.employees-form-card button[type="submit"]:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 20px rgba(1, 24, 216, 0.4);
+}
+
+/* Button Styles */
+.employees-container .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1.4rem;
+  border-radius: 50px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.employees-container .btn::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(255,255,255,0.2);
+  border-radius: 50px;
+  transform: scale(0);
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.employees-container .btn:hover::after {
+  transform: scale(1.5);
+  opacity: 0;
+}
+
+.employees-container .btn:active {
+  transform: translateY(2px);
+}
+
+.employees-container .btn-primary {
+  background: linear-gradient(135deg, #D50B8B, #1B56FD);
+  color: white;
+  box-shadow: 0 4px 15px rgba(1, 24, 216, 0.3);
+}
+
+.employees-container .btn-primary:hover {
+  box-shadow: 0 7px 20px rgba(1, 24, 216, 0.4);
+  transform: translateY(-2px);
+}
+
+.employees-container .btn-secondary {
+  background-color: #fff;
+  color: #1B56FD;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(27, 86, 253, 0.3);
+}
+
+.employees-container .btn-secondary:hover {
+  background-color: rgba(27, 86, 253, 0.05);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.employees-container .btn-danger {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+.employees-container .btn-danger:hover {
+  box-shadow: 0 7px 20px rgba(231, 76, 60, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Icons in buttons */
+.employees-container .btn i {
+  margin-right: 0.4rem;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.form-actions .btn {
+  flex: 1;
+}
+
+/* Focus styles for accessibility */
+.employees-container :focus {
+  outline: 3px solid rgba(27, 86, 253, 0.3);
+  outline-offset: 2px;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 992px) {
+  .employees-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .employees-form-card {
+    margin-bottom: 2rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .employees-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .employees-header .btn {
+    align-self: flex-start;
+  }
+  
+  .employees-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .employees-container {
+    padding: 0 1rem;
+    margin: 1rem auto;
+  }
+  
+  .employees-form-card, .employees-list-card {
+    padding: 1.5rem 1rem;
+  }
+  
+  .employees-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .employee-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .employee-actions .btn {
+    width: 100%;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+}
+
+/* Loading Animation */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.loading-employee {
+  animation: pulse 1.5s infinite;
+}

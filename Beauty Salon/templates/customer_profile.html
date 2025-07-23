@@ -1,0 +1,65 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Beauty Salon - Edit Profile{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/customer.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-card">
+        <h2>Edit Profile</h2>
+        <form action="{{ url_for('customer_profile') }}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" value="{{ current_user.name }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="profile_picture">Profile Picture</label>
+                <div class="profile-picture-preview">
+                    {% if current_user.profile_picture and current_user.profile_picture != 'default_profile.jpg' %}
+                        <img src="{{ url_for('static', filename=current_user.profile_picture) }}" alt="{{ current_user.name }}">
+                    {% else %}
+                        <div class="profile-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+                <p class="input-hint">Select an image to update your profile picture</p>
+            </div>
+            
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" value="{{ current_user.email }}" readonly disabled>
+                <p class="input-hint">Email cannot be changed</p>
+            </div>
+            
+            <div class="form-actions">
+                <a href="{{ url_for('customer_dashboard') }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Preview profile picture before upload
+    document.getElementById('profile_picture').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewContainer = document.querySelector('.profile-picture-preview');
+                previewContainer.innerHTML = `<img src="${e.target.result}" alt="Profile Preview">`;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

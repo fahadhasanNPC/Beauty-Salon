@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 500);
         }, 5000);
     });
-
+        //Got cooked
     // Add animation to elements when they come into view
     const animateOnScroll = function() {
         const elements = document.querySelectorAll('.feature-card, .about, .salon-card');
